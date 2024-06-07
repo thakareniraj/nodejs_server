@@ -36,7 +36,18 @@ async function connectToMongo() {
 
 // Route to check server status
 app.get("/", (req, res) => {
-  res.send("Hello World");
+  try {
+    const client = connectToMongo();
+    const db = client.db(dbName);
+    const collection = db.collection("data");
+
+    const documents = collection.find({}).toArray();
+
+    res.json(documents);
+  } catch (err) {
+    console.error("An error occurred:", err);
+    res.status(500).send("An error occurred while fetching data.");
+  }
 });
 
 app.post("/data", (req, res) => {
