@@ -4,6 +4,7 @@ require("dotenv").config();
 const mongoose = require("mongoose");
 const jsondata = require("./data.json");
 
+const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json());
 
@@ -35,13 +36,13 @@ async function connectToMongo() {
 }
 
 // Route to check server status
-app.get("/", (req, res) => {
+app.get("/", async (req, res) => {
   try {
-    const client = connectToMongo();
+    const client = await connectToMongo();
     const db = client.db(dbName);
     const collection = db.collection("data");
 
-    const documents = collection.find({}).toArray();
+    const documents = await collection.find({}).toArray();
 
     res.json(documents);
   } catch (err) {
@@ -49,7 +50,6 @@ app.get("/", (req, res) => {
     res.status(500).send("An error occurred while fetching data.");
   }
 });
-
 app.post("/data", (req, res) => {
   res.send("posted");
 });
@@ -274,5 +274,5 @@ app.post("/topic", async (req, res) => {
 
 // Start the server
 app.listen(process.env.PORT || 3000, () => {
-  console.log("Example app listening on port 3000!");
+  console.log(`Example app listening on {PORT}`);
 });
